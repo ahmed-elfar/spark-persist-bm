@@ -40,5 +40,7 @@ object TPCHPersistingResults {
     }
     )
 
+    Thread.sleep(10000000)
+
   }
 }

@@ -1,21 +1,74 @@
 package spark;
 
 
+import datagen.TestSelectSingleColumn;
 import org.apache.spark.launcher.SparkAppHandle;
 import org.apache.spark.launcher.SparkLauncher;
+import spark.conf.DefaultPropertiesReader;
+import tpch.TPCHParquetLocal;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-import static spark.Config.*;
+import static spark.Config2.*;
+//import static spark.Config.*;
 
 public class SparkSubmit {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        submitScript("TPCH Original", TPCHPersistBaseTable.class.getName(), 1);
-        submitScript("TPCH Persist base Tables", TPCHPersistBaseTable.class.getName(), 1);
-        submitScript("TPCH Persist Result Memory", TPCHPersistingResults.class.getName(), 1, "memory");
-        submitScript("TPCH Persist Result Disk", TPCHPersistingResults.class.getName(), 1, "disk");
+    public static void main(String[] args) throws Exception {
+
+        if(args.length == 2){
+            Config2.getConfig().putAll(new DefaultPropertiesReader(args[1]).getProperties());
+        }
+
+        if(args.length != 0) {
+            switch (Integer.valueOf(args[0])) {
+                case 1: {
+                    submitScript("TPCH Original", TPCHOriginal.class.getName(), 1);
+                    break;
+                }
+                case 2: {
+                    submitScript("TPCH Persist base Tables Memory", TPCHPersistBaseTable.class.getName(), 1, "memory");
+                    break;
+                }
+                case 3: {
+                    submitScript("TPCH Persist base Tables Memory", TPCHPersistBaseTable.class.getName(), 1, "disk");
+                    break;
+                }
+                case 4: {
+                    submitScript("Shuffled Sequential Queries", ShuffledSequentialQueries.class.getName(), 1, args[2]);
+                    break;
+                } case 5: {
+                    submitScript("Concurrent Queries", ConcurrentQueries.class.getName(), 1, args[2]);
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Unknown run ID : " + args[0]);
+            }
+        }
+
+        //submitScript("TPCH Parquet Local", TPCHParquetLocal.class.getName(), 1);
+
+        //submitScript("TPCH Original", TPCHOriginal.class.getName(), 1);
+
+        //submitScript("TPCH Persist base Tables Disk", TPCHPersistBaseTable.class.getName(), 1, "disk");
+        //submitScript("TPCH Persist base Tables Memory", TPCHPersistBaseTable.class.getName(), 1, "memory");
+        //submitScript("TPCH Persist base Tables Off Heap", TPCHPersistBaseTable.class.getName(), 1, "offHeap");
+
+        //submitScript("TPCH Persist base Tables Catalog Memory", CachingTablesUsingCatalog.class.getName(), 1, "memory");
+
+        //submitScript("TPCH Persist Result Memory", TPCHPersistingResults.class.getName(), 1, "memory");
+        //submitScript("TPCH Persist Result Disk", TPCHPersistingResults.class.getName(), 1, "disk");
+
+        //submitScript("Test select single column", TestSelectSingleColumn.class.getName(), 1, "false");
+        //submitScript("Test select single column", TestSelectSingleColumn.class.getName(), 1, "true");
+
+        //submitScript("Test select all columns", TestSelectAllColumn.class.getName(), 1, "false");
+        //submitScript("Test select all columns", TestSelectAllColumn.class.getName(), 1, "true");
+
+        //submitScript("TPCH Persist base Tables ordered by key", TPCHPersistBaseTableOrderedBykey.class.getName(), 1);
+
+        //submitScript("TPCH Hive Support", HiveTPCH.class.getName(), 1);
     }
 
     public static double[] submitScript(String appName, String mainClass, int runs, String... appArgs) throws IOException, InterruptedException {
@@ -31,7 +84,7 @@ public class SparkSubmit {
                 .setMainClass(mainClass) // "my.spark.app.Main";
                 .addAppArgs(appArgs);
 
-        getConfig().entrySet().forEach(entry -> spark.setConf(entry.getKey(), entry.getValue()));
+        Config2.getConfig().entrySet().forEach(entry -> spark.setConf(entry.getKey(), entry.getValue()));
 
         CountDownLatch latch = new CountDownLatch(2);
         final long endSubmit[] = {0};
