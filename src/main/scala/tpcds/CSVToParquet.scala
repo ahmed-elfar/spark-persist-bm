@@ -9,9 +9,9 @@ object CSVToParquet {
 
   def main(args: Array[String]): Unit = {
 
-    val headers = "/home/asherif/workspace/tpcdsGen/data.header"
-    val csvs = "/home/asherif/workspace/_tpcdsQnD/1/tpl"
-    val parquetOut = "/home/asherif/workspace/_tpcdsQnD/1/parquet"
+    val headers = "/tpcdsGen/data.header"
+    val csvs = "/_tpcdsQnD/1/tpl"
+    val parquetOut = "/_tpcdsQnD/1/parquet"
 
     val spark = SparkSession.builder().master("local[*]")
       .getOrCreate()

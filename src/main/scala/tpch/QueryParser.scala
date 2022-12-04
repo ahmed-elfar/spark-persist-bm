@@ -6,7 +6,7 @@ import java.util.regex.{Matcher, Pattern}
 
 object QueryParser {
 
-  val queriesPath = "/home/asherif/workspace/tpch1g/queries1tb"
+  val queriesPath = "/tpch1g/queries1tb"
 
   def main(args: Array[String]): Unit = {
 

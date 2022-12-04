@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 
 object TPCDSParquet {
 
-  val parquetDir = "/home/asherif/workspace/_tpcdsQnD/1/parquet"
+  val parquetDir = "/_tpcdsQnD/1/parquet"
   val queriesCount = 22
 
   def load(path: String): Array[String] = {

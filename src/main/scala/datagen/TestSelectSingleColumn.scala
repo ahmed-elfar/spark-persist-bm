@@ -19,7 +19,7 @@ object TestSelectSingleColumn {
     println(df.count())
 
     if(persistBaseTbale){
-      spark.time(df.persist(StorageLevel.DISK_ONLY).foreach(_ => ()))
+      spark.time(df.persist(StorageLevel.MEMORY_ONLY).foreach(_ => ()))
       Thread.sleep(10000)
     }
 
@@ -27,7 +27,8 @@ object TestSelectSingleColumn {
 
     spark.time {
       //AIR
-      spark.sql("select l_shipmode from line_item_wide").foreach(_ => ())
+      spark.sql("select l_shipmode from line_item_wide where l_shipmode = 'AIR'").foreach(_ => ())
+      //spark.sql("select l_shipmode from line_item_wide").foreach(_ => ())
     }
     System.in.read()
   }

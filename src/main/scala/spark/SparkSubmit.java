@@ -8,20 +8,21 @@ import spark.conf.DefaultPropertiesReader;
 import tpch.TPCHParquetLocal;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
-import static spark.Config2.*;
-//import static spark.Config.*;
+//import static spark.Config2.*;
+import static spark.Config.*;
 
 public class SparkSubmit {
 
     public static void main(String[] args) throws Exception {
 
-        if(args.length == 2){
+        if (args.length == 2) {
             Config2.getConfig().putAll(new DefaultPropertiesReader(args[1]).getProperties());
         }
 
-        if(args.length != 0) {
+        if (args.length != 0) {
             switch (Integer.valueOf(args[0])) {
                 case 1: {
                     submitScript("TPCH Original", TPCHOriginal.class.getName(), 1);
@@ -38,8 +39,13 @@ public class SparkSubmit {
                 case 4: {
                     submitScript("Shuffled Sequential Queries", ShuffledSequentialQueries.class.getName(), 1, args[2]);
                     break;
-                } case 5: {
+                }
+                case 5: {
                     submitScript("Concurrent Queries", ConcurrentQueries.class.getName(), 1, args[2]);
+                    break;
+                }
+                case 6: {
+                    submitScript("Concurrent TPCH 22 Queries", TPCH22.class.getName(), 1, args[2]);
                     break;
                 }
                 default:
@@ -47,12 +53,10 @@ public class SparkSubmit {
             }
         }
 
-        //submitScript("TPCH Parquet Local", TPCHParquetLocal.class.getName(), 1);
-
-        //submitScript("TPCH Original", TPCHOriginal.class.getName(), 1);
+        //submitScript("TPCH Original", TPCHOriginal.class.getName(), 3);
 
         //submitScript("TPCH Persist base Tables Disk", TPCHPersistBaseTable.class.getName(), 1, "disk");
-        //submitScript("TPCH Persist base Tables Memory", TPCHPersistBaseTable.class.getName(), 1, "memory");
+        submitScript("TPCH Persist base Tables Memory", TPCHPersistBaseTable.class.getName(), 1, "memory");
         //submitScript("TPCH Persist base Tables Off Heap", TPCHPersistBaseTable.class.getName(), 1, "offHeap");
 
         //submitScript("TPCH Persist base Tables Catalog Memory", CachingTablesUsingCatalog.class.getName(), 1, "memory");
@@ -69,11 +73,21 @@ public class SparkSubmit {
         //submitScript("TPCH Persist base Tables ordered by key", TPCHPersistBaseTableOrderedBykey.class.getName(), 1);
 
         //submitScript("TPCH Hive Support", HiveTPCH.class.getName(), 1);
+
+        //submitScript("Concurrent Queries", ConcurrentQueries.class.getName(), 1, "");
+
+        //submitScript("TPCH Parquet Local", TPCHParquetLocal.class.getName(), 1);
+
+        //submitScript("Multiple Context", MultipleContext.class.getName(), 1, "memory");
     }
 
     public static double[] submitScript(String appName, String mainClass, int runs, String... appArgs) throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
         System.out.println("RUNNING " + appName);
+        if(appArgs != null && appArgs.length != 0){
+            Arrays.deepToString(appArgs);
+        }
+
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         SparkLauncher spark = new SparkLauncher()
                 .setVerbose(true)
@@ -84,7 +98,7 @@ public class SparkSubmit {
                 .setMainClass(mainClass) // "my.spark.app.Main";
                 .addAppArgs(appArgs);
 
-        Config2.getConfig().entrySet().forEach(entry -> spark.setConf(entry.getKey(), entry.getValue()));
+        Config.getConfig().entrySet().forEach(entry -> spark.setConf(entry.getKey(), entry.getValue()));
 
         CountDownLatch latch = new CountDownLatch(2);
         final long endSubmit[] = {0};

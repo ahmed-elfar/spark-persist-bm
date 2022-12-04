@@ -1,5 +1,6 @@
 package spark;
 
+import sys.Constants;
 import org.apache.spark.launcher.SparkAppHandle;
 import org.apache.spark.launcher.SparkLauncher;
 
@@ -24,7 +25,7 @@ public class SubmitPython {
                 .setAppName(appName)
                 .setMaster(SPARK_MASTER)
                 .setSparkHome(SPARK_HOME)
-                .setAppResource("/home/asherif/PycharmProjects/SparkArrow/driver/Logic.py") // "/my/app.jar"
+                .setAppResource(Constants.HOME_PATH() + "/SparkArrow/driver/Logic.py") // "/my/app.jar"
                 //.setMainClass(mainClass) // "my.spark.app.Main";
                 .addAppArgs(appArgs);
 

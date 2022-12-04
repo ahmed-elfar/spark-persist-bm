@@ -1,16 +1,15 @@
 package datagen
 
+import sys.Constants
 import org.apache.spark.sql.{SaveMode, SparkSession, functions}
 
 object GenerateData {
 
   val columns = 50
-  val inputParquet = "/home/asherif/workspace/tpch1g/tpch/10/parquet/lineitem"
-
-  val wideParquetOut = "/home/asherif/workspace/tpch1g/tpch/10/lineItemWide"
+  val inputParquet =  Constants.HOME_PATH + "/tpch1g/tpch/10/parquet/lineitem"
+  val wideParquetOut = Constants.HOME_PATH + "/tpch1g/tpch/10/lineItemWide"
   val columnToReplicate = "l_orderkey"
-
-  val tallTable = "/home/asherif/workspace/tpch1g/tpch/10/lineItemTall"
+  val tallTable = Constants.HOME_PATH + "/tpch1g/tpch/10/lineItemTall"
 
   def main(args: Array[String]): Unit = {
 
@@ -19,7 +18,7 @@ object GenerateData {
 
     //val df = spark.read.parquet(wideParquetOut)
     //df.select("l_shipmode").groupBy("l_shipmode").agg(functions.count("l_shipmode").as("countDistinct")).show(1000, false)
-    //widenTable(spark)
+    widenTable(spark)
 
     //expandTable(spark)
 
@@ -47,7 +46,7 @@ object GenerateData {
       (df, columnNumber) => df.withColumn(columnToReplicate + "_" + columnNumber, functions.col(columnToReplicate))
     }
 
-    lineItemWide = lineItemWide.unionByName(lineItemWide)
+    //lineItemWide = lineItemWide.unionByName(lineItemWide)
 
     println("Columns count after replication: " + lineItemWide.columns.length)
     lineItemWide.write.mode(SaveMode.Overwrite).parquet(wideParquetOut)

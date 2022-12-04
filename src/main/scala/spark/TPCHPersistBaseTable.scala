@@ -12,11 +12,11 @@ object TPCHPersistBaseTable {
     parquetFiles
       .map(dir => {
         val arr = dir.split("/")
-        (arr(arr.length-1).split("\\.")(0), dir)
+        (arr(arr.length - 1).split("\\.")(0), dir)
       })
       .foreach(tup => {
         val df = spark.read.parquet(tup._2)
-          if(storageLevel != StorageLevel.NONE) df.persist(storageLevel)
+        if (storageLevel != StorageLevel.NONE) df.persist(storageLevel)
         df.foreach(_ => ())
         df.createOrReplaceTempView(tup._1)
       })
@@ -40,21 +40,38 @@ object TPCHPersistBaseTable {
     spark.sparkContext.setLogLevel("WARN")
 
     val storageLevel = args(0) match {
-      case "memory" => StorageLevel.MEMORY_ONLY
+      case "memory" => StorageLevel.MEMORY_AND_DISK //TODO
       case "offHeap" => StorageLevel.OFF_HEAP
       case _ => StorageLevel.DISK_ONLY
     }
 
-    spark.time(registerTable(parquetDir, spark, storageLevel))
-    Thread.sleep(30000)
+    spark.time(registerTable2(parquetDir, spark, storageLevel))
+    Thread.sleep(5000)
 
-    queries.zip(Stream from 1).foreach(tup2 => {
-      print("Q" + tup2._2 + ", ")
-      spark.time {
-        spark.sql(tup2._1).foreach(_ => ())
+
+    //spark.sparkContext.killExecutors(Seq("0", "1", "2"))
+
+    spark.time {
+      queries.zip(Stream from 1).foreach(tup2 => {
+        print("Q" + tup2._2 + ", ")
+        spark.time {
+          spark.sql(tup2._1).foreach(_ => ())
+        }
       }
+      )
     }
-    )
+
+    //    //new
+    //    Thread.sleep(60000)
+    //
+    //    queries.zip(Stream from 1).foreach(tup2 => {
+    //      print("Q" + tup2._2 + ", ")
+    //      spark.time {
+    //        spark.sql(tup2._1).foreach(_ => ())
+    //      }
+    //    }
+    //    )
+    //    //end new
 
     Thread.sleep(10000000)
   }

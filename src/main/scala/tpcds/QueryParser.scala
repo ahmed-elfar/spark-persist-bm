@@ -7,7 +7,7 @@ import spark.TPCHOriginal.queriesCount
 object QueryParser {
 
 
-  val queriesPath = "/home/asherif/workspace/_tpcdsQnD/queries/query_0.sql"
+  val queriesPath = "/_tpcdsQnD/queries/query_0.sql"
 
   def getQueries(queriesPath: String): Array[String] = {
 

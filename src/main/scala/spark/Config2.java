@@ -5,11 +5,8 @@ import java.util.Map;
 
 public class Config2 {
 
-    final static String SPARK_HOME = "/home/incorta/IncortaAnalytics/IncortaNode/spark";
+    final static String SPARK_HOME = "";
     final static String SPARK_MASTER = "k8s://https://10.107.0.2:443";
-    //final static String WAREHOUSE_DIR = "/home/asherif/programs/spark-2.4.3/spark-warehouse";
- //   final static String WORKING_DIR = "/home/asherif/programs/spark-2.4.3/tmp";
-//    final static String APP_RESOURCE = "target/scala-2.11/sparkpersistbenchmark_2.11-0.1.jar";
     final static String APP_RESOURCE = "./SparkPersistBenchMark-assembly-0.1.jar";
 
     final static  Map<String, String> config = new HashMap<>();
